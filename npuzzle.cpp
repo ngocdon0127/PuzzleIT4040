@@ -7,8 +7,8 @@
 #include <math.h>
 #include <windows.h>
 #include <time.h>
-#include <Timer.h>
-#include <Timer.cpp>
+#include "Timer.h"
+#include "Timer.cpp"
 
 #define N 4
 #define NUMSUFF 1000

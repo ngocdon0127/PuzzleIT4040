@@ -1,5 +1,3 @@
-cd "D:\Learning\HUST\IT4040 Artificial Intelligence\Bai tap lon"
-D:
 arg_npuzzle1.exe 10
 arg_npuzzle1.exe 10
 arg_npuzzle1.exe 10
