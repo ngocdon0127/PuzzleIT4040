@@ -10,7 +10,7 @@
 #include "Timer.h"
 #include "Timer.cpp"
 
-#define N 4
+//#define N 4
 #define NUMSUFF 1000
 #define UP 1
 #define DOWN 2
@@ -22,7 +22,7 @@ using namespace std;
 typedef unsigned char datatype;
 
 struct Node{
-	datatype cell[N][N];
+	datatype **cell;
 	int f;
 	int g;
 	Node *parent;
@@ -32,6 +32,7 @@ struct Node{
 char fi[] = "npuzzle.txt";
 char fn[1000];
 char tmp[1000];
+int N;
 
 char *existArr;
 int numOfNode = 1;
@@ -76,8 +77,13 @@ int down(void);
 int left(void);
 int right(void);
 int print(void);
+int freeNode(Node *p);
+int copy(Node *a, Node *b);
+
+Node* newNode(void);
 Node* pick(void);
 Node* pick1(void);
+
 
 int main(void){
 	function[0] = &up;
@@ -86,12 +92,13 @@ int main(void){
 	function[3] = &right;
 	
 	readData();
+//	puts("readData ok");
 	if (!checkSolvable(node)){
 		puts("Unsolvable.");
 		return 0;
 	};
-	puts("Press any key to continue.");
-	getch();
+//	puts("Press any key to continue.");
+//	getch();
 	init();
 //	char ch;
 	choice = '2';
@@ -121,18 +128,37 @@ int main(void){
 	Timer ti;
 	treeSearch1();
 	double y = ti.getElapsedTime();
+	printf("Thoi gian: %.3f s, Do dai loi giai: %i.", y, deep);
 	set<Node*>::iterator it = setNode.begin();
 	Node *nodeToFree = NULL;
 	for(; it != setNode.end(); it++){
 		if (*it == node)
 			continue;
 		nodeToFree = *it;
-		free(nodeToFree);
+		freeNode(nodeToFree);
 	}
 	listNode.clear();
 	setNode.clear();
-	printf("Thoi gian: %.3f s, Do dai loi giai: %i.", y, deep);
 	return 0;
+}
+
+Node* newNode(void){
+	Node *p = new Node;
+	p->cell = (datatype**) calloc(N, sizeof(datatype*));
+	if (p->cell == NULL){
+		return NULL;
+	}
+	for(int i = 0; i < N; i++){
+		p->cell[i] = (datatype*) calloc(N, sizeof(datatype));
+		if (p->cell[i] == NULL){
+			for(int j = 0; j < i; j++){
+				free(p->cell[j]);
+			}
+			free(p->cell);
+			return NULL;
+		}
+	}
+	return p;
 }
 
 int checkSolvable(Node *p){
@@ -170,7 +196,7 @@ int print(void){
 		}
 		puts("");
 	}
-	printf("%i", countShuffle);
+//	printf("%i", countShuffle);
 }
 
 int readData(void){
@@ -178,14 +204,20 @@ int readData(void){
 	if (!f){
 		exit(0);
 	}
-	node = (Node*) malloc(sizeof(Node));
-	datatype *p = (datatype*) &(node->cell[0][0]);
-	for(int i = 0; i < N * N; i++){
-		fscanf(f, "%i", p + i);
+	fscanf(f, "%i", &N);
+//	printf("N = %i\n", N);
+	node = newNode();
+//	puts("newNode ok");
+	datatype **p = node->cell;
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			fscanf(f, "%i", &p[i][j]);
+		}
 	}
 	fclose(f);
 	node->f = 0;
 	node->g = 0;
+	print();
 	return 0;
 }
 
@@ -241,7 +273,7 @@ int swap(datatype &x, datatype &y){
 }
 
 int init(void){
-//	node = new Node;
+//	node = newNode();
 //	datatype *m = &(node->cell[0][0]);
 //	for(int i = 0; i < N * N; i++)
 //		m[i] = i;
@@ -274,7 +306,7 @@ int init(void){
 }
 
 //int init1(void){
-//	node = new Node;
+//	node = newNode();
 //	srand(time(NULL));
 //	datatype *m = &(node->cell[0][0]);
 //	for(int i = 0; i < N * N; i++)
@@ -312,25 +344,25 @@ int init(void){
 //	setNode.insert(node);
 //}
 
-int key(Node *p){
-	int value = 0;
-	datatype *x = (datatype*) &(p->cell[0][0]);
-	datatype m = *x;
-	int k = 0;
-	int l1 = N * N;
-	int l =  l1 - 1;
-	for(int i = 0; i < l; i++){
-		m = *(x + i);
-		k = m * (int) pow((l1), i);
-		//printf("m = %i k = %i\n", m, k);
-		value += k;
-	}
-	if (value < 0)
-		puts("hehe");
-	if (value > sizeAlloc)
-		puts("hihi");
-	return value;
-}
+//int key(Node *p){
+//	int value = 0;
+//	datatype *x = (datatype*) &(p->cell[0][0]);
+//	datatype m = *x;
+//	int k = 0;
+//	int l1 = N * N;
+//	int l =  l1 - 1;
+//	for(int i = 0; i < l; i++){
+//		m = *(x + i);
+//		k = m * (int) pow((l1), i);
+//		//printf("m = %i k = %i\n", m, k);
+//		value += k;
+//	}
+//	if (value < 0)
+//		puts("hehe");
+//	if (value > sizeAlloc)
+//		puts("hihi");
+//	return value;
+//}
 
 int calculate(Node *p){
 	int sum;
@@ -579,9 +611,9 @@ int treeSearch(void){
 		y = blank_y(p);
 		// blank up
 		if ((x > 0) && (p->action != DOWN)){
-			p1 = new Node;
+			p1 = newNode();
 			setNode.insert(p1);
-			*p1 = *p;
+			copy(p1, p);
 			p1->cell[x - 1][y] = 0;
 			p1->cell[x][y] = p->cell[x-1][y];
 			p1->g = p->g + 1;
@@ -597,9 +629,9 @@ int treeSearch(void){
 		
 		// blank down
 		if ((x < N - 1) && (p->action != UP)){
-			p1 = new Node;
+			p1 = newNode();
 			setNode.insert(p1);
-			*p1 = *p;
+			copy(p1, p);
 			p1->cell[x + 1][y] = 0;
 			p1->cell[x][y] = p->cell[x + 1][y];
 			p1->g = p->g + 1;
@@ -615,9 +647,9 @@ int treeSearch(void){
 		
 		// blank left
 		if ((y > 0) && (p->action != RIGHT)){
-			p1 = new Node;
+			p1 = newNode();
 			setNode.insert(p1);
-			*p1 = *p;
+			copy(p1, p);
 			p1->cell[x][y - 1] = 0;
 			p1->cell[x][y] = p->cell[x][y - 1];
 			p1->g = p->g + 1;
@@ -633,9 +665,9 @@ int treeSearch(void){
 		
 		// blank right
 		if ((y < N - 1) && (p->action != LEFT)){
-			p1 = new Node;
+			p1 = newNode();
 			setNode.insert(p1);
-			*p1 = *p;
+			copy(p1, p);
 			p1->cell[x][y + 1] = 0;
 			p1->cell[x][y] = p->cell[x][y + 1];
 			p1->g = p->g + 1;
@@ -673,7 +705,7 @@ int treeSearch1(void){
 				if (*it == node)
 					continue;
 				nodeToFree = *it;
-				free(nodeToFree);
+				freeNode(nodeToFree);
 			}
 			//puts("after clean");
 			//getch();
@@ -701,10 +733,12 @@ int treeSearch1(void){
 			
 			// blank up
 			if ((x > 0) && (p->action != DOWN)){
-				p1 = new Node;
+				p1 = newNode();
 				numOfNode++;
 				setNode.insert(p1);
-				*p1 = *p;
+//				puts("before");
+				copy(p1, p);
+//				puts("after");
 				p1->cell[x - 1][y] = 0;
 				p1->cell[x][y] = p->cell[x-1][y];
 				p1->g = p->g + 1;
@@ -728,10 +762,10 @@ int treeSearch1(void){
 			
 			// blank down
 			if ((x < N - 1) && (p->action != UP)){
-				p1 = new Node;
+				p1 = newNode();
 				numOfNode++;
 				setNode.insert(p1);
-				*p1 = *p;
+				copy(p1, p);
 				p1->cell[x + 1][y] = 0;
 				p1->cell[x][y] = p->cell[x + 1][y];
 				p1->g = p->g + 1;
@@ -755,10 +789,10 @@ int treeSearch1(void){
 			
 			// blank left
 			if ((y > 0) && (p->action != RIGHT)){
-				p1 = new Node;
+				p1 = newNode();
 				numOfNode++;
 				setNode.insert(p1);
-				*p1 = *p;
+				copy(p1, p);
 				p1->cell[x][y - 1] = 0;
 				p1->cell[x][y] = p->cell[x][y - 1];
 				p1->g = p->g + 1;
@@ -782,10 +816,10 @@ int treeSearch1(void){
 			
 			// blank right
 			if ((y < N - 1) && (p->action != LEFT)){
-				p1 = new Node;
+				p1 = newNode();
 				numOfNode++;
 				setNode.insert(p1);
-				*p1 = *p;
+				copy(p1, p);
 				p1->cell[x][y + 1] = 0;
 				p1->cell[x][y] = p->cell[x][y + 1];
 				p1->g = p->g + 1;
@@ -877,4 +911,23 @@ int mark(Node *p){
 	return 1;
 }
 
+int freeNode(Node *p){
+	for(int i = 0; i < N; i++){
+		free(p->cell[i]);
+	}
+	free(p->cell);
+	free(p);
+}
 
+int copy(Node *a, Node *b){
+	a->action = b->action;
+	a->f = b->f;
+	a->g = b->g;
+	a->parent = b->parent;
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			a->cell[i][j] = b->cell[i][j];
+		}
+	}
+	return 0;
+}
