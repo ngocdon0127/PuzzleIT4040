@@ -44,6 +44,8 @@ char choice;
 int cutoff = 0;
 int newcutoff = 0;
 int countShuffle = 0;
+int timeAStar = 30;
+int timeIDAStar = 60;
 
 int (*function[4])(void);
 
@@ -57,8 +59,12 @@ int treeSearch1(void);
 int calculate(Node *p);
 int heuristic1(Node *p);
 int heuristic2(Node *p);
+int heuristic34(Node *p);
+int heuristic3(Node *p);
 int heuristic5(Node *p);
+int heuristic6(Node *p);
 int check(Node *p);
+int checkSolvable(Node *p);
 int result(Node *p);
 int blank_x(Node *p);
 int blank_y(Node *p);
@@ -79,35 +85,41 @@ int main(void){
 	function[1] = &left;
 	function[3] = &right;
 	
-	//readData();
+	readData();
+	if (!checkSolvable(node)){
+		puts("Unsolvable.");
+		return 0;
+	};
+	puts("Press any key to continue.");
+	getch();
 	init();
-	char ch;
+//	char ch;
 	choice = '2';
-	do{
-		print();
-		ch = getch();
-		if (ch != 13){
-			countShuffle++;
-		}
-		switch (ch){
-			case '8':
-				up();
-				break;
-			case '4':
-				left();
-				break;
-			case '6':
-				right();
-				break;
-			case '2':
-				down();
-				break;
-			default:
-				break;
-		}
-	} while (ch != 13);
+//	do{
+//		print();
+//		ch = getch();
+//		if (ch != 13){
+//			countShuffle++;
+//		}
+//		switch (ch){
+//			case '8':
+//				up();
+//				break;
+//			case '4':
+//				left();
+//				break;
+//			case '6':
+//				right();
+//				break;
+//			case '2':
+//				down();
+//				break;
+//			default:
+//				break;
+//		}
+//	} while (ch != 13);
 	Timer ti;
-	treeSearch();
+	treeSearch1();
 	double y = ti.getElapsedTime();
 	set<Node*>::iterator it = setNode.begin();
 	Node *nodeToFree = NULL;
@@ -120,6 +132,33 @@ int main(void){
 	listNode.clear();
 	setNode.clear();
 	printf("Thoi gian: %.3f s, Do dai loi giai: %i.", y, deep);
+	return 0;
+}
+
+int checkSolvable(Node *p){
+	int *a = (int*) malloc(N * N * sizeof(int));
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			a[mapIndex(i, j)] = p->cell[i][j];
+		}
+	}
+	int inversions = 0;
+	for(int i = 0; i < N * N - 1; i++){
+		for(int j = i + 1; j < N * N; j++){
+			if (!a[j]){
+				continue;
+			}
+			if (a[i] > a[j]){
+				inversions++;
+			}
+		}
+	}
+	printf("inversions = %i\n", inversions);
+//	printf("%i %i", N % 2, inversions % 2 == 0);
+//	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && (((N - blank_x(p)) % 2) == (inversions % 2 == 0)))){
+	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && ((blank_x(p) % 2) == (inversions % 2)))){
+		return 1;
+	}
 	return 0;
 }
 
@@ -202,11 +241,11 @@ int swap(datatype &x, datatype &y){
 }
 
 int init(void){
-	node = new Node;
-	datatype *m = &(node->cell[0][0]);
-	for(int i = 0; i < N * N; i++)
-		m[i] = i;
-	node->g = 0;
+//	node = new Node;
+//	datatype *m = &(node->cell[0][0]);
+//	for(int i = 0; i < N * N; i++)
+//		m[i] = i;
+//	node->g = 0;
 	node->parent = NULL;
 	node->action = 0;
 	calculate(node);
@@ -301,6 +340,15 @@ int calculate(Node *p){
 			break;
 		case '2':
 			sum = heuristic2(p);
+			break;
+		case '3':
+			sum = heuristic3(p);
+			break;
+		case '5':
+			sum = heuristic5(p);
+			break;
+		case '6':
+			sum = heuristic6(p);
 			break;
 	}
 	p->f = p->g + sum;
@@ -397,6 +445,50 @@ int heuristic2(Node *p){ // Manhattan + Linear Conflict
 	return sum += num;
 }
 
+int heuristic34(Node *p){
+	int cost;
+	int sum = 0;
+	int num;
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			num = p->cell[i][j];
+			if (num == 0){
+				//printf("  ");
+				continue;
+			}
+				
+			cost = (num / N - i) * (num / N - i) + (num % N - j) * (num % N - j);
+			//printf("%i ", cost);
+			sum += cost;
+		}
+//		puts("");
+	}
+	return sum;
+}
+
+int heuristic3(Node *p){
+	
+	int sum = heuristic34(p);
+	//sum -= (int) (sum * 0.15);
+	
+	int num = 0;
+//	int x;
+//	int m = N - 1;
+//	for(int i = 0; i < m; i++){
+//		for(int j = 0; j < m; j++){
+//			if ((mapIndex(i, j) == p->cell[i][j + 1]) && (mapIndex(i, j + 1) == p->cell[i][j]))
+//				num++;
+//			if ((mapIndex(i, j) == p->cell[i + 1][j]) && (mapIndex(i + 1, j) == p->cell[i][j]))
+//				num++;
+//		}
+//	}
+//	
+//	num *= 2;
+//	num = 0;
+//	sum = 0;
+	return sum + num;
+}
+
 int heuristic5(Node *p){ // Tiles out of row and column
 	int sum = 0;
 	int num;
@@ -412,6 +504,34 @@ int heuristic5(Node *p){ // Tiles out of row and column
 	}
 	//puts("hehe");
 	return sum;
+}
+
+int heuristic6(Node *p){ // Custom heuristic
+	int cost;
+	int sum = 0;
+	int num;
+	
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			num = p->cell[i][j];
+			if (num == 0){
+				continue;
+			}
+			int line = 0;
+			int x = abs(num / N - i);
+			int y = abs(num % N - j);
+			if (!x || !y)
+				line = 1;
+			cost = x + y;
+			if (!cost)
+				continue;
+			if (line)
+				sum += 1 + (cost - 1) * 5;
+			else
+				sum += 1 + (cost - 1) * 3;
+		}
+	}
+	return sum - 1;
 }
 
 int mapIndex(int row, int column){
@@ -541,6 +661,7 @@ int treeSearch1(void){
 	int x;
 	int y;
 	int c = 0;
+	cutoff = node->f;
 //	int keyp1;
 	while (1){
 		if (listNode.empty()){
@@ -561,10 +682,11 @@ int treeSearch1(void){
 			setNode.clear();
 			setNode.insert(node);
 			cutoff = newcutoff;
+			c = 0;
 		}
 		while (!listNode.empty()){
 			y = ti.getElapsedTime();
-			if (y > 10){
+			if (y > timeIDAStar){
 				deep = -1;
 				return 0;
 			}
@@ -580,6 +702,7 @@ int treeSearch1(void){
 			// blank up
 			if ((x > 0) && (p->action != DOWN)){
 				p1 = new Node;
+				numOfNode++;
 				setNode.insert(p1);
 				*p1 = *p;
 				p1->cell[x - 1][y] = 0;
@@ -589,10 +712,9 @@ int treeSearch1(void){
 				p1->parent = p;
 				p1->action = UP;
 				int newcost = p1->f;
-				if ((!exist(p1)) && (newcost <= cutoff)){
+				if (newcost <= cutoff){
 					listNode.push_front(p1);
-					mark(p1);
-					numOfNode++;
+//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -607,6 +729,7 @@ int treeSearch1(void){
 			// blank down
 			if ((x < N - 1) && (p->action != UP)){
 				p1 = new Node;
+				numOfNode++;
 				setNode.insert(p1);
 				*p1 = *p;
 				p1->cell[x + 1][y] = 0;
@@ -616,10 +739,9 @@ int treeSearch1(void){
 				p1->parent = p;
 				p1->action = DOWN;
 				int newcost = p1->f;
-				if ((!exist(p1)) && (newcost <= cutoff)){
+				if (newcost <= cutoff){
 					listNode.push_front(p1);
-					mark(p1);
-					numOfNode++;
+//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -634,6 +756,7 @@ int treeSearch1(void){
 			// blank left
 			if ((y > 0) && (p->action != RIGHT)){
 				p1 = new Node;
+				numOfNode++;
 				setNode.insert(p1);
 				*p1 = *p;
 				p1->cell[x][y - 1] = 0;
@@ -643,10 +766,9 @@ int treeSearch1(void){
 				p1->parent = p;
 				p1->action = LEFT;
 				int newcost = p1->f;
-				if ((!exist(p1)) && (newcost <= cutoff)){
+				if (newcost <= cutoff){
 					listNode.push_front(p1);
-					mark(p1);
-					numOfNode++;
+//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -661,6 +783,7 @@ int treeSearch1(void){
 			// blank right
 			if ((y < N - 1) && (p->action != LEFT)){
 				p1 = new Node;
+				numOfNode++;
 				setNode.insert(p1);
 				*p1 = *p;
 				p1->cell[x][y + 1] = 0;
@@ -670,10 +793,9 @@ int treeSearch1(void){
 				p1->parent = p;
 				p1->action = RIGHT;
 				int newcost = p1->f;
-				if ((!exist(p1)) && (newcost <= cutoff)){
+				if (newcost <= cutoff){
 					listNode.push_front(p1);
-					mark(p1);
-					numOfNode++;
+//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -736,13 +858,13 @@ int result(Node *p){
 			puts("right");
 			break;
 	}
-	system("cls");
-	for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++)
-			printf("%2i ", p->cell[i][j]);
-		puts("");
-	}
-	Sleep(100);
+//	system("cls");
+//	for(int i = 0; i < N; i++){
+//		for(int j = 0; j < N; j++)
+//			printf("%2i ", p->cell[i][j]);
+//		puts("");
+//	}
+//	Sleep(100);
 }
 
 int exist(Node *p){
