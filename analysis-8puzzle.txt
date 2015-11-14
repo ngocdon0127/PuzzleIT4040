@@ -1,0 +1,5 @@
+Heuristic   Solved   MinTime    MaxTime    AvgTime        MinNode     MaxNode   AvgNode   AvgDeep
+       4:    4/10     0.0000     5.4562     2.4575              0      38920    23331.3    59
+
+       4:   10/10     0.1003     6.1680     4.6008            424    1699997   198986.7    79
+

@@ -10,19 +10,21 @@
 #include "Timer.h"
 #include "Timer.cpp"
 
-//#define N 4
-#define NUMSUFF 1000
+#define N 4
 #define UP 1
 #define DOWN 2
 #define LEFT 3
 #define RIGHT 4
+#define NUM_HEURISTIC 4
+#define START_STATE 0
+#define FINISH_STATE 10
 
 using namespace std;
 
 typedef unsigned char datatype;
 
 struct Node{
-	datatype **cell;
+	datatype cell[N][N];
 	int f;
 	int g;
 	Node *parent;
@@ -32,28 +34,47 @@ struct Node{
 char fi[] = "npuzzle.txt";
 char fn[1000];
 char tmp[1000];
-int N;
 
 char *existArr;
-int numOfNode = 1;
+float numOfNode = 1;
 int sizeAlloc = 0;
 list<Node*> listNode;
 set<Node*> setNode;
 Node *node;
-Node *goal;
 int deep = 0;
 char choice;
+int timeAStar = 5;
+int timeIDAStar = 5;
+
 int cutoff = 0;
 int newcutoff = 0;
-int countShuffle = 0;
-int timeAStar = 30;
-int timeIDAStar = 60;
+int startState = 0;
+
+double aMinTime[NUM_HEURISTIC] = {0.0};
+double aMaxTime[NUM_HEURISTIC] = {0.0};
+double aSumTime[NUM_HEURISTIC] = {0.0};
+float aMinNode[NUM_HEURISTIC] = {0.0};
+float aMaxNode[NUM_HEURISTIC] = {0.0};
+float aSumNode[NUM_HEURISTIC] = {0.0};
+int aSumDeep[NUM_HEURISTIC] = {0};
+int aSolved[NUM_HEURISTIC] = {0};
+
+double iDAMinTime[NUM_HEURISTIC] = {0.0};
+double iDAMaxTime[NUM_HEURISTIC] = {0.0};
+double iDASumTime[NUM_HEURISTIC] = {0.0};
+float iDAMinNode[NUM_HEURISTIC] = {0.0};
+float iDAMaxNode[NUM_HEURISTIC] = {0.0};
+float iDASumNode[NUM_HEURISTIC] = {0.0};
+int iDASumDeep[NUM_HEURISTIC] = {0};
+int iDASolved[NUM_HEURISTIC] = {0};
 
 int (*function[4])(void);
 
+int generatePuzzle(void);
 int readData(void);
 int init(void);
 int init1(void);
+int print(void);
 int mapIndex(int row, int column);
 int treeSearch(void);
 int treeSearch1(void);
@@ -71,103 +92,170 @@ int blank_y(Node *p);
 int key(Node *p);
 int exist(Node *p);
 int mark(Node *p);
+int swap(datatype& x, datatype &y);
 int up(void);
 int down(void);
 int left(void);
 int right(void);
-int print(void);
-int freeNode(Node *p);
-int copy(Node *a, Node *b);
-
-Node* newNode(void);
 Node* pick(void);
-Node* pick1(void);
 
-
-int main(void){
-	function[0] = &up;
-	function[2] = &down;
-	function[1] = &left;
-	function[3] = &right;
-	
-	readData();
-//	puts("readData ok");
-	if (!checkSolvable(node)){
-		puts("Unsolvable.");
+int main(int argc, char **argv){
+	srand(time(NULL));
+//	function[0] = &up;
+//	function[2] = &down;
+//	function[1] = &left;
+//	function[3] = &right;
+//	startState = atoi(argv[1]);
+//	itoa(numShuffle, tmp, 10);
+//	strcpy(fn, "shuffle_");
+//	strcat(fn, tmp);
+//	strcat(fn, ".txt");
+//	char command[1000];
+//	strcpy(command, "shuffle_arg.exe ");
+//	strcat(command, tmp);
+//	system(command);
+	//readData()
+	//init();
+	FILE *f = fopen("startState.txt", "w");
+	if (!f){
 		return 0;
-	};
-//	puts("Press any key to continue.");
-//	getch();
-	init();
-//	char ch;
-	do{
-		puts("1. Manhattan");
-		puts("2. Linear Conflict");
-		puts("3. Tiles out of row and column");
-		puts("4. Pythagorean (not admissable)");
-		choice = getch();
-	} while ((choice < '1') || (choice > '4'));
-//	choice = '3';
-//	do{
-//		print();
-//		ch = getch();
-//		if (ch != 13){
-//			countShuffle++;
-//		}
-//		switch (ch){
-//			case '8':
-//				up();
-//				break;
-//			case '4':
-//				left();
-//				break;
-//			case '6':
-//				right();
-//				break;
-//			case '2':
-//				down();
-//				break;
-//			default:
-//				break;
-//		}
-//	} while (ch != 13);
-	puts("Searching...");
-	Timer ti;
-	treeSearch1();
-	double y = ti.getElapsedTime();
+	}
+	f = fopen("result.txt", "w");
+	if (!f){
+		return 0;
+	}
+	for(startState = START_STATE; startState < FINISH_STATE; startState++){
+		do{
+			generatePuzzle();
+			puts("generated");
+		} while (!checkSolvable(node));
+		FILE *f = fopen("startState.txt", "a");
+		if (!f){
+			return 0;
+		}
+		fprintf(f, "%i\n", startState);
+		for(int i = 0; i < N; i++){
+			for(int j = 0; j < N; j++){
+				fprintf(f, "%3i", node->cell[i][j]);
+			}
+			fprintf(f, "\n");
+		}
+		fprintf(f, "\n");
+		fclose(f);
+		for(choice = '4'; choice <= '4'; choice++){
+	//		if (choice == '4')
+	//			continue;
+			
+			// A*
+			numOfNode = 0;
+			FILE *fresult;
+			fresult = fopen("result.txt", "a");
+			if (!fresult){
+				continue;
+			}
+			Timer ti;
+			init1();
+			//puts("\ninit done");
+			treeSearch();
+			double y = ti.getElapsedTime();
+			fprintf(fresult, "%-3i: heuristic %c :      %-9.0f %-3i %6.4f s | ", startState, choice, numOfNode, deep, y);
+			fclose(fresult);
+			printf("done %c of test %i.\n", choice, startState);
+			int sttHeuristic = choice - 49;
+			if (deep >= 0){
+				aSolved[sttHeuristic]++;
+				if (startState == 0){
+					aMaxTime[sttHeuristic] = aMinTime[sttHeuristic] = y;
+					aMinNode[sttHeuristic] = aMaxNode[sttHeuristic] = numOfNode;
+				}
+				else{
+					aMaxTime[sttHeuristic] = aMaxTime[sttHeuristic] < y ? y : aMaxTime[sttHeuristic];
+					aMinTime[sttHeuristic] = aMinTime[sttHeuristic] > y ? y : aMinTime[sttHeuristic];
+					aMaxNode[sttHeuristic] = aMaxNode[sttHeuristic] < numOfNode ? numOfNode : aMaxNode[sttHeuristic];
+					aMinNode[sttHeuristic] = aMinNode[sttHeuristic] > numOfNode ? numOfNode : aMinNode[sttHeuristic];
+				}
+				aSumTime[sttHeuristic] += y;
+				aSumNode[sttHeuristic] += numOfNode;
+				aSumDeep[sttHeuristic] += deep;
+			}
+			
+			// IDA*
+			numOfNode = 0;
+			fresult = fopen("result.txt", "a");
+			if (!fresult){
+				continue;
+			}
+			Timer ti1;
+			init1();
+			//puts("\ninit done");
+			treeSearch1();
+			double y1 = ti1.getElapsedTime();
+			fprintf(fresult, "%-9.0f %-3i %6.4f s\n",numOfNode, deep, y1);
+			fclose(fresult);
+			printf("done %c of test %i.\n", choice, startState);
+			if (deep >= 0){
+				iDASolved[sttHeuristic]++;
+				if (startState == 0){
+					iDAMaxTime[sttHeuristic] = iDAMinTime[sttHeuristic] = y;
+					iDAMinNode[sttHeuristic] = iDAMaxNode[sttHeuristic] = numOfNode;
+				}
+				else{
+					iDAMaxTime[sttHeuristic] = iDAMaxTime[sttHeuristic] < y ? y : iDAMaxTime[sttHeuristic];
+					iDAMinTime[sttHeuristic] = iDAMinTime[sttHeuristic] > y ? y : iDAMinTime[sttHeuristic];
+					iDAMaxNode[sttHeuristic] = iDAMaxNode[sttHeuristic] < numOfNode ? numOfNode : iDAMaxNode[sttHeuristic];
+					iDAMinNode[sttHeuristic] = iDAMinNode[sttHeuristic] > numOfNode ? numOfNode : iDAMinNode[sttHeuristic];
+				}
+				iDASumTime[sttHeuristic] += y;
+				iDASumNode[sttHeuristic] += numOfNode;
+				iDASumDeep[sttHeuristic] += deep;
+			}
+		}
+		FILE *fresult = fopen("result.txt", "a");
+		if (!fresult){
+				return 0;
+		}
+		fprintf(fresult, "\n");
+		fclose(fresult);
+	}
 	system("cls");
-	result(goal);
-	printf("Heuristic %c.\nThoi gian: %.3f s, Do dai loi giai: %i.", choice, y, deep);
+	f = fopen("analysis-8puzzle.txt", "w");
+	if (!f){
+		return 0;
+	}
+	puts("Start writing result.");
+	fprintf(f, "%-10s%8s  %8s %10s %10s     %10s  %10s%10s%10s\n", "Heuristic", "Solved", "MinTime", "MaxTime", "AvgTime", "MinNode", "MaxNode", "AvgNode", "AvgDeep");
+	for(int i = 3; i < NUM_HEURISTIC; i++){
+		fprintf(f, "%8i: ", i + 1);
+		fprintf(f, "%4i/%-4i   ", aSolved[i], FINISH_STATE - START_STATE);
+		fprintf(f, "%-10.4f %-10.4f ", aMinTime[i], aMaxTime[i]);
+		fprintf(f, "%-10.4f ", aSumTime[i] / aSolved[i]);
+		fprintf(f, "%10.0f %10.0f ", aMinNode[i], aMaxNode[i]);
+		fprintf(f, "%10.1f ", aSumNode[i] / aSolved[i]);
+		fprintf(f, "%5i\n\n", aSumDeep[i] / aSolved[i]);
+	}
+	
+	for(int i = 3; i < NUM_HEURISTIC; i++){
+		fprintf(f, "%8i: ", i + 1);
+		fprintf(f, "%4i/%-4i   ", iDASolved[i], FINISH_STATE - START_STATE);
+		fprintf(f, "%-10.4f %-10.4f ", iDAMinTime[i], iDAMaxTime[i]);
+		fprintf(f, "%-10.4f ", iDASumTime[i] / iDASolved[i]);
+		fprintf(f, "%10.0f %10.0f ", iDAMinNode[i], iDAMaxNode[i]);
+		fprintf(f, "%10.1f ", iDASumNode[i] / iDASolved[i]);
+		fprintf(f, "%5i\n\n", iDASumDeep[i] / iDASolved[i]);
+	}
+	puts("Start freeing");
 	set<Node*>::iterator it = setNode.begin();
 	Node *nodeToFree = NULL;
 	for(; it != setNode.end(); it++){
-		if (*it == node)
-			continue;
 		nodeToFree = *it;
-		freeNode(nodeToFree);
+		free(nodeToFree);
 	}
+	puts("End loop");
 	listNode.clear();
 	setNode.clear();
+	
+//	Sleep(1000);
 	return 0;
-}
-
-Node* newNode(void){
-	Node *p = new Node;
-	p->cell = (datatype**) calloc(N, sizeof(datatype*));
-	if (p->cell == NULL){
-		return NULL;
-	}
-	for(int i = 0; i < N; i++){
-		p->cell[i] = (datatype*) calloc(N, sizeof(datatype));
-		if (p->cell[i] == NULL){
-			for(int j = 0; j < i; j++){
-				free(p->cell[j]);
-			}
-			free(p->cell);
-			return NULL;
-		}
-	}
-	return p;
 }
 
 int checkSolvable(Node *p){
@@ -198,6 +286,26 @@ int checkSolvable(Node *p){
 	return 0;
 }
 
+int generatePuzzle(void){
+	node = new Node;
+	int num;
+	int range = N * N;
+	int a[range];
+	for(int i = 0; i < range; i++)
+		a[i] = 0;
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			do{
+				num = rand() % range;
+//				printf("num = %i\n", num);
+			} while (a[num]);
+			node->cell[i][j] = num;
+			a[num] = 1;
+		}
+	}
+//	print();
+}
+
 int print(void){
 	system("cls");
 	for(int i = 0; i < N; i++){
@@ -207,6 +315,7 @@ int print(void){
 		puts("");
 	}
 //	printf("%i", countShuffle);
+	getch();
 }
 
 int readData(void){
@@ -214,20 +323,12 @@ int readData(void){
 	if (!f){
 		exit(0);
 	}
-	fscanf(f, "%i", &N);
-//	printf("N = %i\n", N);
-	node = newNode();
-//	puts("newNode ok");
-	datatype **p = node->cell;
-	for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++){
-			fscanf(f, "%i", &p[i][j]);
-		}
+	node = (Node*) malloc(sizeof(Node));
+	datatype *p = (datatype*) &(node->cell[0][0]);
+	for(int i = 0; i < N * N; i++){
+		fscanf(f, "%i", p + i);
 	}
 	fclose(f);
-	node->f = 0;
-	node->g = 0;
-	print();
 	return 0;
 }
 
@@ -283,11 +384,7 @@ int swap(datatype &x, datatype &y){
 }
 
 int init(void){
-//	node = newNode();
-//	datatype *m = &(node->cell[0][0]);
-//	for(int i = 0; i < N * N; i++)
-//		m[i] = i;
-//	node->g = 0;
+	node->g = 0;
 	node->parent = NULL;
 	node->action = 0;
 	calculate(node);
@@ -315,8 +412,8 @@ int init(void){
 	//printf("key node = %i\n", key(node));
 }
 
-//int init1(void){
-//	node = newNode();
+int init1(void){
+//	node = new Node;
 //	srand(time(NULL));
 //	datatype *m = &(node->cell[0][0]);
 //	for(int i = 0; i < N * N; i++)
@@ -343,36 +440,36 @@ int init(void){
 //		(*function[a[i]])();
 //	}
 //	fclose(f);
-//	node->g = 0;
-//	node->parent = NULL;
-//	node->action = 0;
-//	calculate(node);
-//	newcutoff = cutoff = 0;
-//	listNode.clear();
-//	listNode.push_back(node);
-//	setNode.clear();
-//	setNode.insert(node);
-//}
+	node->g = 0;
+	node->parent = NULL;
+	node->action = 0;
+	calculate(node);
+	newcutoff = cutoff = 0;
+	listNode.clear();
+	listNode.push_back(node);
+	setNode.clear();
+	setNode.insert(node);
+}
 
-//int key(Node *p){
-//	int value = 0;
-//	datatype *x = (datatype*) &(p->cell[0][0]);
-//	datatype m = *x;
-//	int k = 0;
-//	int l1 = N * N;
-//	int l =  l1 - 1;
-//	for(int i = 0; i < l; i++){
-//		m = *(x + i);
-//		k = m * (int) pow((l1), i);
-//		//printf("m = %i k = %i\n", m, k);
-//		value += k;
-//	}
-//	if (value < 0)
-//		puts("hehe");
-//	if (value > sizeAlloc)
-//		puts("hihi");
-//	return value;
-//}
+int key(Node *p){
+	int value = 0;
+	datatype *x = (datatype*) &(p->cell[0][0]);
+	datatype m = *x;
+	int k = 0;
+	int l1 = N * N;
+	int l =  l1 - 1;
+	for(int i = 0; i < l; i++){
+		m = *(x + i);
+		k = m * (int) pow((l1), i);
+		//printf("m = %i k = %i\n", m, k);
+		value += k;
+	}
+	if (value < 0)
+		puts("hehe");
+	if (value > sizeAlloc)
+		puts("hihi");
+	return value;
+}
 
 int calculate(Node *p){
 	int sum;
@@ -522,37 +619,6 @@ int heuristic3(Node *p){ // Tiles out of row and column
 	return sum;
 }
 
-//int heuristic5(Node *p){ // Custom heuristic
-//	int cost;
-//	int sum = 0;
-//	int num;
-//	
-//	for(int i = 0; i < N; i++){
-//		for(int j = 0; j < N; j++){
-//			num = p->cell[i][j];
-//			if (num == 0){
-//				continue;
-//			}
-//			int line = 0;
-//			int x = abs(num / N - i);
-//			int y = abs(num % N - j);
-//			if (!x || !y)
-//				line = 1;
-//			cost = x + y;
-//			if (!cost)
-//				continue;
-//			if (line)
-//				sum += 1 + (cost - 1) * 5;
-//			else{
-//				cost = (int) sqrt(cost);
-//				sum += 1 + (cost - 1) * 3;
-//			}
-////				sum += 1 + (cost - 1) * 3;
-//		}
-//	}
-//	return sum - 1;
-//}
-
 int mapIndex(int row, int column){
 	return row * N + column;
 }
@@ -584,14 +650,13 @@ int treeSearch(void){
 //	int keyp1;
 	while (!listNode.empty()){
 		y = ti.getElapsedTime();
-		if (y > 30){
+		if (y > timeAStar){
 			deep = -1;
 			return 0;
 		}
 		p = pick();
 		if (check(p)){
-//			result(p);
-			goal = p;
+			result(p);
 			deep = p->g;
 			return 0;
 		}
@@ -599,74 +664,74 @@ int treeSearch(void){
 		y = blank_y(p);
 		// blank up
 		if ((x > 0) && (p->action != DOWN)){
-			p1 = newNode();
+			p1 = new Node;
 			setNode.insert(p1);
-			copy(p1, p);
+			*p1 = *p;
 			p1->cell[x - 1][y] = 0;
 			p1->cell[x][y] = p->cell[x-1][y];
 			p1->g = p->g + 1;
 			calculate(p1);
 			p1->parent = p;
 			p1->action = UP;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank down
 		if ((x < N - 1) && (p->action != UP)){
-			p1 = newNode();
+			p1 = new Node;
 			setNode.insert(p1);
-			copy(p1, p);
+			*p1 = *p;
 			p1->cell[x + 1][y] = 0;
 			p1->cell[x][y] = p->cell[x + 1][y];
 			p1->g = p->g + 1;
 			calculate(p1);
 			p1->parent = p;
 			p1->action = DOWN;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank left
 		if ((y > 0) && (p->action != RIGHT)){
-			p1 = newNode();
+			p1 = new Node;
 			setNode.insert(p1);
-			copy(p1, p);
+			*p1 = *p;
 			p1->cell[x][y - 1] = 0;
 			p1->cell[x][y] = p->cell[x][y - 1];
 			p1->g = p->g + 1;
 			calculate(p1);
 			p1->parent = p;
 			p1->action = LEFT;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank right
 		if ((y < N - 1) && (p->action != LEFT)){
-			p1 = newNode();
+			p1 = new Node;
 			setNode.insert(p1);
-			copy(p1, p);
+			*p1 = *p;
 			p1->cell[x][y + 1] = 0;
 			p1->cell[x][y] = p->cell[x][y + 1];
 			p1->g = p->g + 1;
 			calculate(p1);
 			p1->parent = p;
 			p1->action = RIGHT;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		//system("cls");
 //		printf("%i:%i blank [%i] [%i]\n", numOfNode, listNode.size(), x, y);
@@ -693,7 +758,7 @@ int treeSearch1(void){
 				if (*it == node)
 					continue;
 				nodeToFree = *it;
-				freeNode(nodeToFree);
+				free(nodeToFree);
 			}
 			//puts("after clean");
 			//getch();
@@ -712,8 +777,7 @@ int treeSearch1(void){
 			}
 			p = pick1();
 			if (check(p)){
-//				result(p);
-				goal = p;
+				result(p);
 				deep = p->g;
 				return 0;
 			}
@@ -722,12 +786,10 @@ int treeSearch1(void){
 			
 			// blank up
 			if ((x > 0) && (p->action != DOWN)){
-				p1 = newNode();
+				p1 = new Node;
 				numOfNode++;
 				setNode.insert(p1);
-//				puts("before");
-				copy(p1, p);
-//				puts("after");
+				*p1 = *p;
 				p1->cell[x - 1][y] = 0;
 				p1->cell[x][y] = p->cell[x-1][y];
 				p1->g = p->g + 1;
@@ -751,10 +813,10 @@ int treeSearch1(void){
 			
 			// blank down
 			if ((x < N - 1) && (p->action != UP)){
-				p1 = newNode();
+				p1 = new Node;
 				numOfNode++;
 				setNode.insert(p1);
-				copy(p1, p);
+				*p1 = *p;
 				p1->cell[x + 1][y] = 0;
 				p1->cell[x][y] = p->cell[x + 1][y];
 				p1->g = p->g + 1;
@@ -778,10 +840,10 @@ int treeSearch1(void){
 			
 			// blank left
 			if ((y > 0) && (p->action != RIGHT)){
-				p1 = newNode();
+				p1 = new Node;
 				numOfNode++;
 				setNode.insert(p1);
-				copy(p1, p);
+				*p1 = *p;
 				p1->cell[x][y - 1] = 0;
 				p1->cell[x][y] = p->cell[x][y - 1];
 				p1->g = p->g + 1;
@@ -805,10 +867,10 @@ int treeSearch1(void){
 			
 			// blank right
 			if ((y < N - 1) && (p->action != LEFT)){
-				p1 = newNode();
+				p1 = new Node;
 				numOfNode++;
 				setNode.insert(p1);
-				copy(p1, p);
+				*p1 = *p;
 				p1->cell[x][y + 1] = 0;
 				p1->cell[x][y] = p->cell[x][y + 1];
 				p1->g = p->g + 1;
@@ -867,27 +929,27 @@ int result(Node *p){
 		return 0;
 	}
 	result(p->parent);
-	switch (p->action){
-		case UP:
-			puts("up");
-			break;
-		case DOWN:
-			puts("down");
-			break;
-		case LEFT:
-			puts("left");
-			break;
-		case RIGHT:
-			puts("right");
-			break;
-	}
+//	switch (p->action){
+//		case UP:
+//			puts("up");
+//			break;
+//		case DOWN:
+//			puts("down");
+//			break;
+//		case LEFT:
+//			puts("left");
+//			break;
+//		case RIGHT:
+//			puts("right");
+//			break;
+//	}
 //	system("cls");
 //	for(int i = 0; i < N; i++){
 //		for(int j = 0; j < N; j++)
 //			printf("%2i ", p->cell[i][j]);
 //		puts("");
 //	}
-//	Sleep(100);
+//	Sleep(10);
 }
 
 int exist(Node *p){
@@ -898,25 +960,4 @@ int exist(Node *p){
 int mark(Node *p){
 	//existArr[key(p)] = 1;
 	return 1;
-}
-
-int freeNode(Node *p){
-	for(int i = 0; i < N; i++){
-		free(p->cell[i]);
-	}
-	free(p->cell);
-	free(p);
-}
-
-int copy(Node *a, Node *b){
-	a->action = b->action;
-	a->f = b->f;
-	a->g = b->g;
-	a->parent = b->parent;
-	for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++){
-			a->cell[i][j] = b->cell[i][j];
-		}
-	}
-	return 0;
 }

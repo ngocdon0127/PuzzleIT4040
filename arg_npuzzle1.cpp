@@ -10,7 +10,7 @@
 #include <Timer.h>
 #include <Timer.cpp>
 
-#define N 6
+#define N 3
 #define UP 1
 #define DOWN 2
 #define LEFT 3
