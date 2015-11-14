@@ -94,9 +94,9 @@ int main(int argc, char **argv){
 	system(command);
 	//readData()
 	//init();
-	for(choice = '1'; choice <= '3'; choice++){
-//		if ((choice == '5') || ((choice == '4')))
-//			continue;
+	for(choice = '1'; choice <= '5'; choice++){
+		if (choice == '4')
+			continue;
 		numOfNode = 0;
 		FILE *fresult;
 		fresult = fopen("result.txt", "a");
@@ -308,6 +308,9 @@ int calculate(Node *p){
 			break;
 		case '3':
 			sum = heuristic3(p);
+			break;
+		case '5':
+			sum = heuristic5(p);
 			break;
 	}
 	p->f = p->g + sum;

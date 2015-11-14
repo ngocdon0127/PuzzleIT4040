@@ -40,6 +40,7 @@ int sizeAlloc = 0;
 list<Node*> listNode;
 set<Node*> setNode;
 Node *node;
+Node *goal;
 int deep = 0;
 char choice;
 int cutoff = 0;
@@ -60,8 +61,8 @@ int treeSearch1(void);
 int calculate(Node *p);
 int heuristic1(Node *p);
 int heuristic2(Node *p);
-int heuristic34(Node *p);
 int heuristic3(Node *p);
+int heuristic4(Node *p);
 int heuristic5(Node *p);
 int heuristic6(Node *p);
 int check(Node *p);
@@ -101,7 +102,14 @@ int main(void){
 //	getch();
 	init();
 //	char ch;
-	choice = '2';
+	do{
+		puts("1. Manhattan");
+		puts("2. Linear Conflict");
+		puts("3. Tiles out of row and column");
+		puts("4. Pythagorean (not admissable)");
+		choice = getch();
+	} while ((choice < '1') || (choice > '4'));
+//	choice = '3';
 //	do{
 //		print();
 //		ch = getch();
@@ -125,10 +133,13 @@ int main(void){
 //				break;
 //		}
 //	} while (ch != 13);
+	puts("Searching...");
 	Timer ti;
 	treeSearch1();
 	double y = ti.getElapsedTime();
-	printf("Thoi gian: %.3f s, Do dai loi giai: %i.", y, deep);
+	system("cls");
+	result(goal);
+	printf("Heuristic %c.\nThoi gian: %.3f s, Do dai loi giai: %i.", choice, y, deep);
 	set<Node*>::iterator it = setNode.begin();
 	Node *nodeToFree = NULL;
 	for(; it != setNode.end(); it++){
@@ -179,7 +190,8 @@ int checkSolvable(Node *p){
 			}
 		}
 	}
-	printf("inversions = %i\n", inversions);
+//	printf("inversions = %i\n", inversions);
+	puts("");
 //	printf("%i %i", N % 2, inversions % 2 == 0);
 //	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && (((N - blank_x(p)) % 2) == (inversions % 2 == 0)))){
 	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && ((blank_x(p) % 2) == (inversions % 2)))){
@@ -376,17 +388,14 @@ int calculate(Node *p){
 		case '3':
 			sum = heuristic3(p);
 			break;
-		case '5':
-			sum = heuristic5(p);
-			break;
-		case '6':
-			sum = heuristic6(p);
+		case '4':
+			sum = heuristic4(p);
 			break;
 	}
 	p->f = p->g + sum;
 }
 
-int heuristic1(Node *p){
+int heuristic1(Node *p){ // Manhattan
 	int cost;
 	int sum = 0;
 	int num;
@@ -477,7 +486,7 @@ int heuristic2(Node *p){ // Manhattan + Linear Conflict
 	return sum += num;
 }
 
-int heuristic34(Node *p){
+int heuristic4(Node *p){ // Pythagorean - not admissable
 	int cost;
 	int sum = 0;
 	int num;
@@ -498,30 +507,7 @@ int heuristic34(Node *p){
 	return sum;
 }
 
-int heuristic3(Node *p){
-	
-	int sum = heuristic34(p);
-	//sum -= (int) (sum * 0.15);
-	
-	int num = 0;
-//	int x;
-//	int m = N - 1;
-//	for(int i = 0; i < m; i++){
-//		for(int j = 0; j < m; j++){
-//			if ((mapIndex(i, j) == p->cell[i][j + 1]) && (mapIndex(i, j + 1) == p->cell[i][j]))
-//				num++;
-//			if ((mapIndex(i, j) == p->cell[i + 1][j]) && (mapIndex(i + 1, j) == p->cell[i][j]))
-//				num++;
-//		}
-//	}
-//	
-//	num *= 2;
-//	num = 0;
-//	sum = 0;
-	return sum + num;
-}
-
-int heuristic5(Node *p){ // Tiles out of row and column
+int heuristic3(Node *p){ // Tiles out of row and column
 	int sum = 0;
 	int num;
 	for(int i = 0; i < N; i++){
@@ -538,33 +524,36 @@ int heuristic5(Node *p){ // Tiles out of row and column
 	return sum;
 }
 
-int heuristic6(Node *p){ // Custom heuristic
-	int cost;
-	int sum = 0;
-	int num;
-	
-	for(int i = 0; i < N; i++){
-		for(int j = 0; j < N; j++){
-			num = p->cell[i][j];
-			if (num == 0){
-				continue;
-			}
-			int line = 0;
-			int x = abs(num / N - i);
-			int y = abs(num % N - j);
-			if (!x || !y)
-				line = 1;
-			cost = x + y;
-			if (!cost)
-				continue;
-			if (line)
-				sum += 1 + (cost - 1) * 5;
-			else
-				sum += 1 + (cost - 1) * 3;
-		}
-	}
-	return sum - 1;
-}
+//int heuristic5(Node *p){ // Custom heuristic
+//	int cost;
+//	int sum = 0;
+//	int num;
+//	
+//	for(int i = 0; i < N; i++){
+//		for(int j = 0; j < N; j++){
+//			num = p->cell[i][j];
+//			if (num == 0){
+//				continue;
+//			}
+//			int line = 0;
+//			int x = abs(num / N - i);
+//			int y = abs(num % N - j);
+//			if (!x || !y)
+//				line = 1;
+//			cost = x + y;
+//			if (!cost)
+//				continue;
+//			if (line)
+//				sum += 1 + (cost - 1) * 5;
+//			else{
+//				cost = (int) sqrt(cost);
+//				sum += 1 + (cost - 1) * 3;
+//			}
+////				sum += 1 + (cost - 1) * 3;
+//		}
+//	}
+//	return sum - 1;
+//}
 
 int mapIndex(int row, int column){
 	return row * N + column;
@@ -603,7 +592,8 @@ int treeSearch(void){
 		}
 		p = pick();
 		if (check(p)){
-			result(p);
+//			result(p);
+			goal = p;
 			deep = p->g;
 			return 0;
 		}
@@ -724,7 +714,8 @@ int treeSearch1(void){
 			}
 			p = pick1();
 			if (check(p)){
-				result(p);
+//				result(p);
+				goal = p;
 				deep = p->g;
 				return 0;
 			}
