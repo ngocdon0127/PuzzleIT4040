@@ -30,65 +30,65 @@ struct Node{
 };
 
 char fi[] = "npuzzle.txt";
-char fn[1000];
-char tmp[1000];
-int N;
+//char fn[1000];
+//char tmp[1000];
+int N;							// Width of Puzzle
 
-char *existArr;
-int numOfNode = 1;
-int sizeAlloc = 0;
-list<Node*> listNode;
-set<Node*> setNode;
-Node *node;
-Node *goal;
-int deep = 0;
-char choice;
-int cutoff = 0;
-int newcutoff = 0;
-int countShuffle = 0;
-int timeAStar = 30;
-int timeIDAStar = 60;
+//char *existArr;
+int numOfNode = 1;				// No. of node used to search
+//int sizeAlloc = 0;
+list<Node*> listNode;			// Fringe
+set<Node*> setNode;				// Store all used node. Used to free memory
+Node *node;						// Start State
+Node *goal;						// Store Goal State
+int deep = 0;					// Solution 'S Deep
+char choice;					// Heuristic Flag
+int cutoff = 0;					// Use in IDA*
+int newcutoff = 0;				// Use in IDA*
+int countShuffle = 0;			// No. of step to shuffle Puzzle
+int timeAStar = 30;				// If A* run too long, terminate it
+int timeIDAStar = 60;			// If IDA* run too long, terminate it
 
-int (*function[4])(void);
+int (*function[4])(void);		// Use in analyzing only
 
 int readData(void);
 int init(void);
 int init1(void);
-int mapIndex(int row, int column);
-int treeSearch(void);
-int treeSearch1(void);
+int mapIndex(int row, int column);  // Convert 2D cordinate to 1D cordinate
+int treeSearch(void);			// A* Search
+int treeSearch1(void);			// IDA* Search
 //int calculateCost(Node *p);
 int calculate(Node *p);
-int heuristic1(Node *p);
-int heuristic2(Node *p);
-int heuristic3(Node *p);
-int heuristic4(Node *p);
-int check(Node *p);
-int checkSolvable(Node *p);
-int result(Node *p);
-int blank_x(Node *p);
-int blank_y(Node *p);
-int key(Node *p);
-int exist(Node *p);
-int mark(Node *p);
-int up(void);
-int down(void);
-int left(void);
-int right(void);
-int print(void);
-int freeNode(Node *p);
-int copy(Node *a, Node *b);
+int heuristic1(Node *p); 		// Manhattan
+int heuristic2(Node *p); 		// Manhattan + Linear Conflict
+int heuristic3(Node *p); 		// Tiles out of row and column
+int heuristic4(Node *p); 		// Pythagorean - not admissable
+int check(Node *p);		 		// Check if p is goal state or not
+int checkSolvable(Node *p);		// Check state if it is solvable or not
+int result(Node *p);			// Print solution
+int blank_x(Node *p);			// return x cordinate of blank tile
+int blank_y(Node *p);			// return y cordinate of blank tile
+//int key(Node *p);
+//int exist(Node *p);
+//int mark(Node *p);
+int up(void);					// blank up.    For analyzing only
+int down(void);					// blank down.  For analyzing only
+int left(void);					// blank left.  For analyzing only
+int right(void);				// blank right. For analyzing only
+int print(void);				// print current state
+int freeNode(Node *p);			// Free memory allocated for node p
+int copy(Node *a, Node *b);		// copy data from b to a
 
 Node* newNode(void);
-Node* pick(void);
-Node* pick1(void);
+Node* pick(void);				// Choose one node to expand from fringe. Use in A*
+Node* pick1(void);				// Choose one node to expand from fringe. Use in IDA*
 
 
 int main(void){
-	function[0] = &up;
-	function[2] = &down;
-	function[1] = &left;
-	function[3] = &right;
+//	function[0] = &up;
+//	function[2] = &down;
+//	function[1] = &left;
+//	function[3] = &right;
 	
 	readData();
 //	puts("readData ok");
@@ -296,7 +296,7 @@ int init(void){
 	listNode.push_back(node);
 	setNode.clear();
 	setNode.insert(node);
-	sizeAlloc = 0;
+//	sizeAlloc = 0;
 //	for(int i = N * N - 2; i >=0; i-- ){
 //		sizeAlloc += (int) (i + 1) * pow(N * N, i + 1);
 //	}
@@ -393,7 +393,7 @@ int calculate(Node *p){
 	p->f = p->g + sum;
 }
 
-int heuristic1(Node *p){ // Manhattan
+int heuristic1(Node *p){
 	int cost;
 	int sum = 0;
 	int num;
@@ -429,7 +429,7 @@ int inColumn(int position, int column){
 	return 0;
 }
 
-int heuristic2(Node *p){ // Manhattan + Linear Conflict
+int heuristic2(Node *p){
 	
 	int sum = heuristic1(p);
 	int num = 0;
@@ -484,7 +484,7 @@ int heuristic2(Node *p){ // Manhattan + Linear Conflict
 	return sum += num;
 }
 
-int heuristic4(Node *p){ // Pythagorean - not admissable
+int heuristic4(Node *p){
 	int cost;
 	int sum = 0;
 	int num;
@@ -505,7 +505,7 @@ int heuristic4(Node *p){ // Pythagorean - not admissable
 	return sum;
 }
 
-int heuristic3(Node *p){ // Tiles out of row and column
+int heuristic3(Node *p){
 	int sum = 0;
 	int num;
 	for(int i = 0; i < N; i++){
@@ -608,11 +608,11 @@ int treeSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = UP;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank down
@@ -626,11 +626,11 @@ int treeSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = DOWN;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank left
@@ -644,11 +644,11 @@ int treeSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = LEFT;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		
 		// blank right
@@ -662,11 +662,11 @@ int treeSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = RIGHT;
-			if (!exist(p1)){
+//			if (!exist(p1)){
 				listNode.push_back(p1);
-				mark(p1);
+//				mark(p1);
 				numOfNode++;
-			}
+//			}
 		}
 		//system("cls");
 //		printf("%i:%i blank [%i] [%i]\n", numOfNode, listNode.size(), x, y);
