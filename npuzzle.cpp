@@ -54,7 +54,7 @@ int (*function[4])(void);		// Use in analyzing only
 int readData(void);
 int init(void);
 int init1(void);
-int mapIndex(int row, int column);  // Convert 2D cordinate to 1D cordinate
+int mapIndex(int row, int column);  // Convert 2D coordinates to 1D coordinates
 int treeSearch(void);			// A* Search
 int treeSearch1(void);			// IDA* Search
 //int calculateCost(Node *p);
@@ -66,8 +66,8 @@ int heuristic4(Node *p); 		// Pythagorean - not admissable
 int check(Node *p);		 		// Check if p is goal state or not
 int checkSolvable(Node *p);		// Check state if it is solvable or not
 int result(Node *p);			// Print solution
-int blank_x(Node *p);			// return x cordinate of blank tile
-int blank_y(Node *p);			// return y cordinate of blank tile
+int blank_x(Node *p);			// return x coordinates of blank tile
+int blank_y(Node *p);			// return y coordinates of blank tile
 //int key(Node *p);
 //int exist(Node *p);
 //int mark(Node *p);
