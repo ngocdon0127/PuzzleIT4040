@@ -63,7 +63,7 @@ int heuristic1(Node *p); 		// Manhattan
 int heuristic2(Node *p); 		// Manhattan + Linear Conflict
 int heuristic3(Node *p); 		// Tiles out of row and column
 int heuristic4(Node *p); 		// Pythagorean - not admissable
-int heuristic5(Node *p);		// N-MaxSwap
+int heuristic5(Node *p);		// N-MaxSwap - Gaschnig's Heuristic
 int check(Node *p);		 		// Check if p is goal state or not
 int checkSolvable(Node *p);		// Check state if it is solvable or not
 int result(Node *p);			// Print solution
@@ -102,12 +102,14 @@ int main(void){
 	init();
 //	char ch;
 	do{
+		print();
 		puts("1. Manhattan");
 		puts("2. Linear Conflict");
 		puts("3. Tiles out of row and column");
 		puts("4. Pythagorean (not admissable)");
 		puts("5. N-MaxSwap");
 		choice = getch();
+		system("cls");
 	} while ((choice < '1') || (choice > '5'));
 //	choice = '3';
 //	do{
@@ -135,7 +137,7 @@ int main(void){
 //	} while (ch != 13);
 	puts("Searching...");
 	Timer ti;
-	treeSearch1();
+	treeSearch();
 	double y = ti.getElapsedTime();
 	system("cls");
 	result(goal);
@@ -229,7 +231,7 @@ int readData(void){
 	fclose(f);
 	node->f = 0;
 	node->g = 0;
-	print();
+//	print();
 	return 0;
 }
 
@@ -525,6 +527,14 @@ int heuristic5(Node *p){
 		B[P[i]] = i;
 	}
 	int count = 0;
+//	for(int i = 0; i < size; i++){
+//		printf("%2i ", i);
+//	}
+//	printf(" | ");
+//	for(int i = 0; i < size; i++){
+//		printf("%2i ", i);
+//	}
+//	puts("");
 	while (1){
 		int check = 1;
 		for(int i = 0; i < size; i++){
@@ -536,11 +546,35 @@ int heuristic5(Node *p){
 		if (check){
 			break;
 		}
-		swap(P[B[0]], P[B[B[0]]]);
-		for(int i = 0; i < size; i++){
-			printf("%3i ", P[i]);
+		if (B[0]){
+			swap(P[B[0]], P[B[B[0]]]);
+			swap(B[0], B[B[0]]);
 		}
-		puts("");
+		else{
+			for(int i = 0; i < size; i++){
+				if (!P[i]){
+					continue;
+				}
+				if (P[i] == i){
+					continue;
+				}
+				swap(P[i], P[B[0]]);
+				swap(B[P[i]], B[0]);
+				break;
+			}
+		}
+//		for(int i = 0; i < size; i++){
+//			B[P[i]] = i;
+//		}
+//		for(int i = 0; i < size; i++){
+//			printf("%2i ", P[i]);
+//		}
+//		printf(" | ");
+//		for(int i = 0; i < size; i++){
+//			printf("%2i ", B[i]);
+//		}
+//		puts("");
+//		getch();
 		count++;
 	}
 //	free(p);
