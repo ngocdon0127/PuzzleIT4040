@@ -9,7 +9,6 @@
 #include <time.h>
 #include "Timer.h"
 #include "Timer.cpp"
-#include "Heuristic.h"
 #include "Heuristic.cpp"
 
 //#define N 4
@@ -90,7 +89,9 @@ int main(void){
 	init();
 //	char ch;
 	do{
+		puts("Problem:");
 		print();
+		puts("\nChoose Heuristic Function:");
 		puts("1. Manhattan");
 		puts("2. Linear Conflict");
 		puts("3. Tiles out of row and column");
@@ -129,6 +130,7 @@ int main(void){
 	double y = ti.getElapsedTime();
 	system("cls");
 	result(goal);
+	puts("");
 	printf("Heuristic %c.\nThoi gian: %.3f s, Do dai loi giai: %i.", choice, y, deep);
 	set<Node*>::iterator it = setNode.begin();
 	Node *nodeToFree = NULL;
@@ -181,7 +183,7 @@ int checkSolvable(Node *p){
 		}
 	}
 //	printf("inversions = %i\n", inversions);
-	puts("");
+//	puts("");
 //	printf("%i %i", N % 2, inversions % 2 == 0);
 //	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && (((N - blank_x(p)) % 2) == (inversions % 2 == 0)))){
 	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && ((blank_x(p) % 2) == (inversions % 2)))){
@@ -191,7 +193,7 @@ int checkSolvable(Node *p){
 }
 
 int print(void){
-	system("cls");
+//	system("cls");
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
 			printf("%3i", node->cell[i][j]);
@@ -731,18 +733,19 @@ int result(Node *p){
 	result(p->parent);
 	switch (p->action){
 		case UP:
-			puts("up");
+			printf("Up ");
 			break;
 		case DOWN:
-			puts("down");
+			printf("Down ");
 			break;
 		case LEFT:
-			puts("left");
+			printf("Left ");
 			break;
 		case RIGHT:
-			puts("right");
+			printf("Right ");
 			break;
 	}
+//	puts("");
 //	system("cls");
 //	for(int i = 0; i < N; i++){
 //		for(int j = 0; j < N; j++)
