@@ -19,10 +19,10 @@
 
 using namespace std;
 
-typedef unsigned char datatype;
+//typedef unsigned char datatype;
 
 struct Node{
-	datatype **cell;
+	char **cell;
 	int f;
 	int g;
 	Node *parent;
@@ -63,6 +63,7 @@ int heuristic1(Node *p); 		// Manhattan
 int heuristic2(Node *p); 		// Manhattan + Linear Conflict
 int heuristic3(Node *p); 		// Tiles out of row and column
 int heuristic4(Node *p); 		// Pythagorean - not admissable
+int heuristic5(Node *p);		// N-MaxSwap
 int check(Node *p);		 		// Check if p is goal state or not
 int checkSolvable(Node *p);		// Check state if it is solvable or not
 int result(Node *p);			// Print solution
@@ -105,8 +106,9 @@ int main(void){
 		puts("2. Linear Conflict");
 		puts("3. Tiles out of row and column");
 		puts("4. Pythagorean (not admissable)");
+		puts("5. N-MaxSwap");
 		choice = getch();
-	} while ((choice < '1') || (choice > '4'));
+	} while ((choice < '1') || (choice > '5'));
 //	choice = '3';
 //	do{
 //		print();
@@ -153,12 +155,12 @@ int main(void){
 
 Node* newNode(void){
 	Node *p = new Node;
-	p->cell = (datatype**) calloc(N, sizeof(datatype*));
+	p->cell = (char**) calloc(N, sizeof(char*));
 	if (p->cell == NULL){
 		return NULL;
 	}
 	for(int i = 0; i < N; i++){
-		p->cell[i] = (datatype*) calloc(N, sizeof(datatype));
+		p->cell[i] = (char*) calloc(N, sizeof(char));
 		if (p->cell[i] == NULL){
 			for(int j = 0; j < i; j++){
 				free(p->cell[j]);
@@ -218,7 +220,7 @@ int readData(void){
 //	printf("N = %i\n", N);
 	node = newNode();
 //	puts("newNode ok");
-	datatype **p = node->cell;
+	char **p = node->cell;
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
 			fscanf(f, "%i", &p[i][j]);
@@ -275,8 +277,8 @@ int right(void){
 	return 0;
 }
 
-int swap(datatype &x, datatype &y){
-	datatype buf = x;
+int swap(char &x, char &y){
+	char buf = x;
 	x = y;
 	y = buf;
 	return 0;
@@ -284,7 +286,7 @@ int swap(datatype &x, datatype &y){
 
 int init(void){
 //	node = newNode();
-//	datatype *m = &(node->cell[0][0]);
+//	char *m = &(node->cell[0][0]);
 //	for(int i = 0; i < N * N; i++)
 //		m[i] = i;
 //	node->g = 0;
@@ -318,7 +320,7 @@ int init(void){
 //int init1(void){
 //	node = newNode();
 //	srand(time(NULL));
-//	datatype *m = &(node->cell[0][0]);
+//	char *m = &(node->cell[0][0]);
 //	for(int i = 0; i < N * N; i++)
 //		m[i] = i;
 ////	for(int i = 0; i < NUMSUFF; i++){
@@ -356,8 +358,8 @@ int init(void){
 
 //int key(Node *p){
 //	int value = 0;
-//	datatype *x = (datatype*) &(p->cell[0][0]);
-//	datatype m = *x;
+//	char *x = (char*) &(p->cell[0][0]);
+//	char m = *x;
 //	int k = 0;
 //	int l1 = N * N;
 //	int l =  l1 - 1;
@@ -388,6 +390,9 @@ int calculate(Node *p){
 			break;
 		case '4':
 			sum = heuristic4(p);
+			break;
+		case '5':
+			sum = heuristic5(p);
 			break;
 	}
 	p->f = p->g + sum;
@@ -503,6 +508,44 @@ int heuristic4(Node *p){
 //		puts("");
 	}
 	return sum;
+}
+
+int heuristic5(Node *p){
+	int size = N * N;
+//	int *p = (int*) calloc(size, sizeof(int));
+//	int *b = (int*) calloc(size, sizeof(int));
+	int P[size];
+	int B[size];
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < N; j++){
+			P[mapIndex(i, j)] = p->cell[i][j];
+		}
+	}
+	for(int i = 0; i < size; i++){
+		B[P[i]] = i;
+	}
+	int count = 0;
+	while (1){
+		int check = 1;
+		for(int i = 0; i < size; i++){
+			if (P[i] != i){
+				check = 0;
+				break;
+			}
+		}
+		if (check){
+			break;
+		}
+		swap(P[B[0]], P[B[B[0]]]);
+		for(int i = 0; i < size; i++){
+			printf("%3i ", P[i]);
+		}
+		puts("");
+		count++;
+	}
+//	free(p);
+//	free(b);
+	return count;
 }
 
 int heuristic3(Node *p){
