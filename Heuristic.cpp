@@ -6,16 +6,18 @@ struct Node{
 	int action;
 };
 
-int N;							// Width of Puzzle
+int N;									// Width of Puzzle
 
-int heuristic1(Node *p); 		// Manhattan
-int heuristic2(Node *p); 		// Manhattan + Linear Conflict
-int heuristic3(Node *p); 		// Tiles out of row and column
-int heuristic4(Node *p); 		// Pythagorean - not admissable
-int heuristic5(Node *p);		// N-MaxSwap - Gaschnig's Heuristic
+
+Node* newNode(void);
+int heuristic1(Node *p); 				// Manhattan
+int heuristic2(Node *p); 				// Manhattan + Linear Conflict
+int heuristic3(Node *p); 				// Tiles out of row and column
+int heuristic4(Node *p); 				// Pythagorean - not admissable
+int heuristic5(Node *p);				// N-MaxSwap - Gaschnig's Heuristic
 int inRow(int position, int row);
 int inColumn(int position, int column);
-int mapIndex(int row, int column);
+int mapIndex(int row, int column); 		// Convert 2D coordinates to 1D coordinates
 
 int heuristic1(Node *p){
 	int cost;
@@ -219,3 +221,26 @@ int heuristic3(Node *p){
 int mapIndex(int row, int column){
 	return row * N + column;
 }
+
+Node* newNode(void){
+	Node *p = new Node;
+	p->cell = (char**) calloc(N, sizeof(char*));
+	if (p->cell == NULL){
+		return NULL;
+	}
+//	puts("p->cell ok");
+	for(int i = 0; i < N; i++){
+		p->cell[i] = (char*) calloc(N, sizeof(char));
+		if (p->cell[i] == NULL){
+//			printf("p->cell[%i] null\n", i);
+			for(int j = 0; j < i; j++){
+				free(p->cell[j]);
+			}
+			free(p->cell);
+			return NULL;
+		}
+//		printf("p->cell[%i] ok\n", i);
+	}
+	return p;
+}
+
