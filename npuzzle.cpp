@@ -182,10 +182,12 @@ int checkSolvable(Node *p){
 			}
 		}
 	}
-//	printf("inversions = %i\n", inversions);
-//	puts("");
-//	printf("%i %i", N % 2, inversions % 2 == 0);
-//	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && (((N - blank_x(p)) % 2) == (inversions % 2 == 0)))){
+	
+	// Puzzle is solvable if and only if:
+	
+//	(N odd && inversions even) OR
+//	(N even && blank on even row from top && inversion even) OR
+//	(N even && blank on odd  row from top && inversion odd )
 	if (((N % 2) && (inversions % 2 == 0))  ||  ((N % 2 == 0) && ((blank_x(p) % 2) == (inversions % 2)))){
 		return 1;
 	}

@@ -16,6 +16,7 @@ int heuristic5(Node *p);		// N-MaxSwap - Gaschnig's Heuristic
 int inRow(int position, int row);
 int inColumn(int position, int column);
 int mapIndex(int row, int column);
+
 int heuristic1(Node *p){
 	int cost;
 	int sum = 0;
