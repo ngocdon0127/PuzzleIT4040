@@ -67,7 +67,7 @@ int main(void){
 		puts("1. Manhattan");
 		puts("2. Linear Conflict");
 		puts("3. Tiles out of row and column");
-		puts("4. Pythagorean (not admissable)");
+		puts("4. Pythagorean (not admissible)");
 		puts("5. N-MaxSwap");
 		choice = getch();
 		system("cls");
