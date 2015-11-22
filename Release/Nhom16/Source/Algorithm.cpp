@@ -109,6 +109,7 @@ int aStarSearch(void){
 			numOfNode++;
 		}
 	}
+    deep = -1;
 	return 0;
 }
 
