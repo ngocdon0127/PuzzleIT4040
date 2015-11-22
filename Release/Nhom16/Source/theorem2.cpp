@@ -28,7 +28,6 @@ int a[size] = {0};			// Used in generate permutation of Puzzle
 int mark[size] = {0};		// Used in generate permutation of Puzzle
 int maxDeepTheorem2 = -1;
 
-int swap(datatype& x, datatype &y);
 int Try(int i);							// generate all permutation of 8-Puzzle
 int initTheorem2(void);					// 
 int solve(void);
@@ -86,13 +85,6 @@ int Try(int i){
 			mark[j] = 0;
 		}
 	}
-}
-
-int swap(datatype &x, datatype &y){
-	datatype buf = x;
-	x = y;
-	y = buf;
-	return 0;
 }
 
 int initTheorem2(void){
