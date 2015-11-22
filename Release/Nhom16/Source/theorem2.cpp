@@ -99,7 +99,7 @@ int initTheorem2(void){
 	node = newNode();
 	if (!node){
 		puts("not enough memory.");
-		return 0;
+		return -1;
 	}
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
