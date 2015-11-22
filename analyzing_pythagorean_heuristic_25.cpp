@@ -14,16 +14,16 @@
 
 #define NUM_HEURISTIC 5
 #define START_STATE 0
-#define FINISH_STATE 1000
+#define FINISH_STATE 10
 
 using namespace std;
 
 typedef unsigned char datatype;
 
 
-char fProblemName[] = "pythagorean_start_state.txt";
-char fResultName[] = "pythagorean_result.txt";
-char fAnalysisName[] = "pythagorean_analysis.txt";
+char fProblemName[] = "pythagorean_start_state_25.txt";
+char fResultName[] = "pythagorean_result_25.txt";
+char fAnalysisName[] = "pythagorean_analysis_25.txt";
 
 
 int startState = 0;
@@ -66,7 +66,7 @@ int freeMemory(void);
 
 int main(int argc, char **argv){
 	srand(time(NULL));
-	N = 4;
+	N = 5;
 	FILE *f = fopen(fProblemName, "w");
 	if (!f){
 		return 0;

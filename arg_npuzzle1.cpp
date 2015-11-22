@@ -53,8 +53,8 @@ int readData(void);
 int init(void);
 int init1(void);
 int mapIndex(int row, int column);
-int treeSearch(void);
-int treeSearch1(void);
+int aStarSearch(void);
+int iDAStarSearch(void);
 //int calculateCost(Node *p);
 int calculate(Node *p);
 int heuristic1(Node *p);
@@ -106,7 +106,7 @@ int main(int argc, char **argv){
 		Timer ti;
 		init1();
 		//puts("\ninit done");
-		treeSearch();
+		aStarSearch();
 		double y = ti.getElapsedTime();
 		fprintf(fresult, "%-3i: heuristic %c :      %-9i %-3i %6.3f s | ", numShuffle, choice, numOfNode, deep, y);
 		fclose(fresult);
@@ -120,7 +120,7 @@ int main(int argc, char **argv){
 		Timer ti1;
 		init1();
 		//puts("\ninit done");
-		treeSearch1();
+		iDAStarSearch();
 		double y1 = ti1.getElapsedTime();
 		fprintf(fresult, "%-9i %-3i %6.3f s\n",numOfNode, deep, y1);
 		fclose(fresult);
@@ -537,7 +537,7 @@ Node* pick1(void){
 	return p;
 }
 
-int treeSearch(void){
+int aStarSearch(void){
 	Timer ti;
 	Node *p;
 	Node *p1;
@@ -635,7 +635,7 @@ int treeSearch(void){
 	return 0;
 }
 
-int treeSearch1(void){
+int iDAStarSearch(void){
 	Timer ti;
 	Node *p;
 	Node *p1;

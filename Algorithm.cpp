@@ -17,8 +17,8 @@ char choice;					// Heuristic Flag
 
 int check(Node *p);		 		// Check if p is goal state or not
 int checkSolvable(Node *p);		// Check state if it is solvable or not
-int treeSearch(void);			// A* Search
-int treeSearch1(void);			// IDA* Search
+int aStarSearch(void);			// A* Search
+int iDAStarSearch(void);			// IDA* Search
 Node* pick(void);				// Choose one node to expand from fringe. Use in A*
 Node* pick1(void);				// Choose one node to expand from fringe. Use in IDA*
 int blank_x(Node *p);			// return x coordinates of blank tile
@@ -27,7 +27,7 @@ int calculate(Node *p);
 int copy(Node *a, Node *b);		// copy data from b to a
 int freeNode(Node *p);			// Free memory allocated for node p
 
-int treeSearch(void){
+int aStarSearch(void){
 	Timer ti;
 	Node *p;
 	Node *p1;
@@ -126,7 +126,7 @@ int treeSearch(void){
 	return 0;
 }
 
-int treeSearch1(void){
+int iDAStarSearch(void){
 	Timer ti;
 	Node *p;
 	Node *p1;

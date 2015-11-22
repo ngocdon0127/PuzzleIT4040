@@ -124,7 +124,7 @@ int main(int argc, char **argv){
 			Timer ti;
 			init();
 //			puts("\ninit done");
-			treeSearch();
+			aStarSearch();
 			double y = ti.getElapsedTime();
 			fprintf(fresult, "%-3i: heuristic %c :      %-9.0f %-3i %10.4f s | ", startState, choice, numOfNode, deep, y);
 			fclose(fresult);
@@ -159,7 +159,7 @@ int main(int argc, char **argv){
 			Timer ti1;
 			init();
 			//puts("\ninit done");
-			treeSearch1();
+			iDAStarSearch();
 			double y1 = ti1.getElapsedTime();
 			fprintf(fresult, "%-9.0f %-3i %10.4f s\n",numOfNode, deep, y1);
 			fclose(fresult);
