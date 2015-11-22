@@ -1,0 +1,8 @@
+http://ethesis.nitrkl.ac.in/5575/1/110CS0081-1.pdf
+http://disi.unitn.it/~montreso/asd/progetti/2007-08/progetto2/The_Manhattan_Pair_Distance_Heuristic_for_the_15-puzzle.pdf
+http://cseweb.ucsd.edu/~ccalabro/essays/15_puzzle.pdf
+https://www.scribd.com/fullscreen/103698298?access_key=key-anvyh6p0mh6yxt4pq40
+http://ai.stanford.edu/~latombe/cs121/2011/slides/D-heuristic-search.pdf
+http://www.cs.unb.ca/profs/hzhang/CS4725/assignments/assgn2-06W-sol.htm
+
+solvable: https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html

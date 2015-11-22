@@ -21,11 +21,6 @@ using namespace std;
 typedef unsigned char datatype;
 
 
-char fi[] = "npuzzle.txt";
-char fn[1000];
-char tmp[1000];
-
-
 int startState = 0;
 
 double aMinTime[NUM_HEURISTIC] = {0.0};
@@ -59,29 +54,10 @@ int exist(Node *p);
 int mark(Node *p);
 int swap(datatype& x, datatype &y);
 int freeMemory(void);
-//int up(void);
-//int down(void);
-//int left(void);
-//int right(void);
 
 int main(int argc, char **argv){
 	srand(time(NULL));
 	N = 3;
-//	function[0] = &up;
-//	function[2] = &down;
-//	function[1] = &left;
-//	function[3] = &right;
-//	startState = atoi(argv[1]);
-//	itoa(numShuffle, tmp, 10);
-//	strcpy(fn, "shuffle_");
-//	strcat(fn, tmp);
-//	strcat(fn, ".txt");
-//	char command[1000];
-//	strcpy(command, "shuffle_arg.exe ");
-//	strcat(command, tmp);
-//	system(command);
-	//readData()
-	//init();
 	FILE *f = fopen("startState.txt", "w");
 	if (!f){
 		return 0;
@@ -111,9 +87,6 @@ int main(int argc, char **argv){
 		fprintf(f, "\n");
 		fclose(f);
 		for(choice = '1'; choice <= '5'; choice++){
-	//		if (choice == '4')
-	//			continue;
-			
 			// A*
 			numOfNode = 0;
 			FILE *fresult;
@@ -123,7 +96,6 @@ int main(int argc, char **argv){
 			}
 			Timer ti;
 			init();
-//			puts("\ninit done");
 			aStarSearch();
 			double y = ti.getElapsedTime();
 			fprintf(fresult, "%-3i: heuristic %c :      %-9.0f %-3i %10.4f s | ", startState, choice, numOfNode, deep, y);
@@ -158,7 +130,6 @@ int main(int argc, char **argv){
 			}
 			Timer ti1;
 			init();
-			//puts("\ninit done");
 			iDAStarSearch();
 			double y1 = ti1.getElapsedTime();
 			fprintf(fresult, "%-9.0f %-3i %10.4f s\n",numOfNode, deep, y1);
@@ -250,7 +221,6 @@ int generatePuzzle(void){
 		for(int j = 0; j < N; j++){
 			do{
 				num = rand() % range;
-//				printf("num = %i\n", num);
 			} while (a[num]);
 			node->cell[i][j] = num;
 			a[num] = 1;

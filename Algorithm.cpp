@@ -33,7 +33,6 @@ int aStarSearch(void){
 	Node *p1;
 	int x;
 	int y;
-//	int keyp1;
 	while (!listNode.empty()){
 		y = ti.getElapsedTime();
 		if (y > 30){
@@ -49,6 +48,7 @@ int aStarSearch(void){
 		}
 		x = blank_x(p);
 		y = blank_y(p);
+		
 		// blank up
 		if ((x > 0) && (p->action != DOWN)){
 			p1 = newNode();
@@ -60,11 +60,8 @@ int aStarSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = UP;
-//			if (!exist(p1)){
-				listNode.push_back(p1);
-//				mark(p1);
-				numOfNode++;
-//			}
+			listNode.push_back(p1);
+			numOfNode++;
 		}
 		
 		// blank down
@@ -78,11 +75,8 @@ int aStarSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = DOWN;
-//			if (!exist(p1)){
-				listNode.push_back(p1);
-//				mark(p1);
-				numOfNode++;
-//			}
+			listNode.push_back(p1);
+			numOfNode++;
 		}
 		
 		// blank left
@@ -96,11 +90,8 @@ int aStarSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = LEFT;
-//			if (!exist(p1)){
-				listNode.push_back(p1);
-//				mark(p1);
-				numOfNode++;
-//			}
+			listNode.push_back(p1);
+			numOfNode++;
 		}
 		
 		// blank right
@@ -114,14 +105,9 @@ int aStarSearch(void){
 			calculate(p1);
 			p1->parent = p;
 			p1->action = RIGHT;
-//			if (!exist(p1)){
-				listNode.push_back(p1);
-//				mark(p1);
-				numOfNode++;
-//			}
+			listNode.push_back(p1);
+			numOfNode++;
 		}
-		//system("cls");
-//		printf("%i:%i blank [%i] [%i]\n", numOfNode, listNode.size(), x, y);
 	}
 	return 0;
 }
@@ -134,12 +120,9 @@ int iDAStarSearch(void){
 	int y;
 	int c = 0;
 	cutoff = node->f;
-//	int keyp1;
 	while (1){
 		if (listNode.empty()){
 			set<Node*>::iterator it = setNode.begin();
-			//puts("before clean");
-			//getch();
 			Node *nodeToFree = NULL;
 			for(; it != setNode.end(); it++){
 				if (*it == node)
@@ -147,8 +130,6 @@ int iDAStarSearch(void){
 				nodeToFree = *it;
 				freeNode(nodeToFree);
 			}
-			//puts("after clean");
-			//getch();
 			listNode.clear();
 			listNode.push_back(node);
 			setNode.clear();
@@ -177,9 +158,7 @@ int iDAStarSearch(void){
 				p1 = newNode();
 				numOfNode++;
 				setNode.insert(p1);
-//				puts("before");
 				copy(p1, p);
-//				puts("after");
 				p1->cell[x - 1][y] = 0;
 				p1->cell[x][y] = p->cell[x-1][y];
 				p1->g = p->g + 1;
@@ -189,7 +168,6 @@ int iDAStarSearch(void){
 				int newcost = p1->f;
 				if (newcost <= cutoff){
 					listNode.push_front(p1);
-//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -216,7 +194,6 @@ int iDAStarSearch(void){
 				int newcost = p1->f;
 				if (newcost <= cutoff){
 					listNode.push_front(p1);
-//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -243,7 +220,6 @@ int iDAStarSearch(void){
 				int newcost = p1->f;
 				if (newcost <= cutoff){
 					listNode.push_front(p1);
-//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -270,7 +246,6 @@ int iDAStarSearch(void){
 				int newcost = p1->f;
 				if (newcost <= cutoff){
 					listNode.push_front(p1);
-//					mark(p1);
 				}
 				else{
 					if (c == 0){
@@ -281,8 +256,6 @@ int iDAStarSearch(void){
 						newcutoff = (newcutoff > newcost) ? newcost : newcutoff;
 				}
 			}
-			//system("cls");
-	//		printf("%i:%i blank [%i] [%i]\n", numOfNode, listNode.size(), x, y);
 		}
 	}
 	return 0;
@@ -334,30 +307,17 @@ int blank_y(Node *p){
 }
 
 int freeNode(Node *p){
-//	puts("start free node");
 	if (!p){
-//		puts("Node null. Free cl a");
 		return 0;
-	}
-	else{
-//		puts("p not null. Free now");
 	}
 	if (p->cell == NULL){
-//		puts("p->cell null. Free cl.");
 		return 0;
 	}
-	else{
-//		puts("p->cell not null. Free now");
-	}
 	for(int i = 0; i < N; i++){
-//		printf("start freeing p->cell[%i] %i\n", i, p->cell[i]);
 		free(p->cell[i]);
-//		printf("p->cell[%i] ok\n", i);
 	}
 	free(p->cell);
-//	puts("free p->cell ok");
 	free(p);
-//	puts("free p ok");
 }
 
 int copy(Node *a, Node *b){

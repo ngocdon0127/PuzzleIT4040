@@ -59,10 +59,6 @@ int exist(Node *p);
 int mark(Node *p);
 int swap(datatype& x, datatype &y);
 int freeMemory(void);
-//int up(void);
-//int down(void);
-//int left(void);
-//int right(void);
 
 int main(int argc, char **argv){
 	srand(time(NULL));
@@ -106,7 +102,6 @@ int main(int argc, char **argv){
 			int sttHeuristic = choice - 49;
 			Timer ti1;
 			init();
-			//puts("\ninit done");
 			iDAStarSearch();
 			double y1 = ti1.getElapsedTime();
 			fprintf(fresult, "%-3i: heuristic %c :      %-9.0f %-3i %10.4f s\n", startState, choice, numOfNode, deep, y1);
@@ -173,7 +168,6 @@ int freeMemory(void){
 		nodeToFree = *it;
 		freeNode(nodeToFree);
 	}
-//	puts("End loop");
 	listNode.clear();
 	setNode.clear();
 }
@@ -189,7 +183,6 @@ int generatePuzzle(void){
 		for(int j = 0; j < N; j++){
 			do{
 				num = rand() % range;
-//				printf("num = %i\n", num);
 			} while (a[num]);
 			node->cell[i][j] = num;
 			a[num] = 1;

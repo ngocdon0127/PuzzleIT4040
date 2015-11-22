@@ -9,7 +9,7 @@ struct Node{
 int N;									// Width of Puzzle
 
 
-Node* newNode(void);
+Node* newNode(void);					// Alloc memory for a Node
 int heuristic1(Node *p); 				// Manhattan
 int heuristic2(Node *p); 				// Manhattan + Linear Conflict
 int heuristic3(Node *p); 				// Tiles out of row and column
@@ -27,17 +27,13 @@ int heuristic1(Node *p){
 		for(int j = 0; j < N; j++){
 			num = p->cell[i][j];
 			if (num == 0){
-				//printf("  ");
 				continue;
 			}
 				
 			cost = abs(num / N - i) + abs(num % N - j);
-			//printf("%i ", cost);
 			sum += cost;
 		}
-//		puts("");
 	}
-//	sum = 0;
 	return sum;
 }
 
@@ -118,23 +114,18 @@ int heuristic4(Node *p){
 		for(int j = 0; j < N; j++){
 			num = p->cell[i][j];
 			if (num == 0){
-				//printf("  ");
 				continue;
 			}
 				
 			cost = (num / N - i) * (num / N - i) + (num % N - j) * (num % N - j);
-			//printf("%i ", cost);
 			sum += cost;
 		}
-//		puts("");
 	}
 	return sum;
 }
 
 int heuristic5(Node *p){
 	int size = N * N;
-//	int *p = (int*) calloc(size, sizeof(int));
-//	int *b = (int*) calloc(size, sizeof(int));
 	int P[size];
 	int B[size];
 	for(int i = 0; i < N; i++){
@@ -146,14 +137,6 @@ int heuristic5(Node *p){
 		B[P[i]] = i;
 	}
 	int count = 0;
-//	for(int i = 0; i < size; i++){
-//		printf("%2i ", i);
-//	}
-//	printf(" | ");
-//	for(int i = 0; i < size; i++){
-//		printf("%2i ", i);
-//	}
-//	puts("");
 	while (1){
 		int check = 1;
 		for(int i = 0; i < size; i++){
@@ -182,22 +165,8 @@ int heuristic5(Node *p){
 				break;
 			}
 		}
-//		for(int i = 0; i < size; i++){
-//			B[P[i]] = i;
-//		}
-//		for(int i = 0; i < size; i++){
-//			printf("%2i ", P[i]);
-//		}
-//		printf(" | ");
-//		for(int i = 0; i < size; i++){
-//			printf("%2i ", B[i]);
-//		}
-//		puts("");
-//		getch();
 		count++;
 	}
-//	free(p);
-//	free(b);
 	return count;
 }
 
@@ -207,14 +176,12 @@ int heuristic3(Node *p){
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < N; j++){
 			num = p->cell[i][j];
-			//printf("%i ", num);
 			if (num / N != i)
 				sum++;
 			if (num % N != j)
 				sum++;
 		}
 	}
-	//puts("hehe");
 	return sum;
 }
 
@@ -228,18 +195,15 @@ Node* newNode(void){
 	if (p->cell == NULL){
 		return NULL;
 	}
-//	puts("p->cell ok");
 	for(int i = 0; i < N; i++){
 		p->cell[i] = (char*) calloc(N, sizeof(char));
 		if (p->cell[i] == NULL){
-//			printf("p->cell[%i] null\n", i);
 			for(int j = 0; j < i; j++){
 				free(p->cell[j]);
 			}
 			free(p->cell);
 			return NULL;
 		}
-//		printf("p->cell[%i] ok\n", i);
 	}
 	return p;
 }
