@@ -1,0 +1,67 @@
+0  : heuristic 4 :      12682     80      0.0230 s
+
+1  : heuristic 4 :      484156    64      0.8417 s
+
+2  : heuristic 4 :      5827      68      0.0085 s
+
+3  : heuristic 4 :      203807    84      0.3317 s
+
+4  : heuristic 4 :      423148    73      0.7196 s
+
+5  : heuristic 4 :      32363     56      0.0501 s
+
+6  : heuristic 4 :      3593      71      0.0055 s
+
+7  : heuristic 4 :      20587     80      0.0318 s
+
+8  : heuristic 4 :      439214    57      0.7157 s
+
+9  : heuristic 4 :      13147     70      0.0193 s
+
+10 : heuristic 4 :      55935     76      0.0850 s
+
+11 : heuristic 4 :      452511    55      0.7655 s
+
+12 : heuristic 4 :      85743     60      0.1348 s
+
+13 : heuristic 4 :      29815     75      0.0445 s
+
+14 : heuristic 4 :      667606    59      1.0840 s
+
+15 : heuristic 4 :      59603     58      0.0941 s
+
+16 : heuristic 4 :      4654      53      0.0065 s
+
+17 : heuristic 4 :      218162    57      0.3371 s
+
+18 : heuristic 4 :      1061216   72      1.7574 s
+
+19 : heuristic 4 :      60888     74      0.0936 s
+
+20 : heuristic 4 :      11628     57      0.0160 s
+
+21 : heuristic 4 :      72515     70      0.1071 s
+
+22 : heuristic 4 :      3267      68      0.0045 s
+
+23 : heuristic 4 :      426927    91      0.7470 s
+
+24 : heuristic 4 :      20784     63      0.0320 s
+
+25 : heuristic 4 :      3715      68      0.0055 s
+
+26 : heuristic 4 :      13214     53      0.0195 s
+
+27 : heuristic 4 :      7983      102     0.0140 s
+
+28 : heuristic 4 :      233189    85      0.3854 s
+
+29 : heuristic 4 :      65419     82      0.1006 s
+
+30 : heuristic 4 :      13184     54      0.0185 s
+
+31 : heuristic 4 :      9351      68      0.0140 s
+
+32 : heuristic 4 :      25167     85      0.0405 s
+
+33 : heuristic 4 :      1015026   73      1.7314 s

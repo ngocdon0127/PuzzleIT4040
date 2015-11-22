@@ -98,7 +98,7 @@ int main(void){
 //	} while (ch != 13);
 	puts("Searching...");
 	Timer ti;
-	treeSearch();
+	treeSearch1();
 	double y = ti.getElapsedTime();
 	system("cls");
 	result(goal);
